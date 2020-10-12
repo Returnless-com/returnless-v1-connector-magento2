@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://www.returnless.com/media/retour-integratie-magento-2.png" width="250"/>
+  <img src="https://www.returnless.com/media/retour-integratie-magento-2.png" width="450"/>
 </p>
 <h1 align="center">Returnless Connector for Magento 2.2.x and higher</h1>
 
