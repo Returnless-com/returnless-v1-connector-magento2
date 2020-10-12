@@ -1,0 +1,17 @@
+{
+    "name": "returnless-com/magento2",
+    "description": "Returnless Connector",
+    "type": "magento2-module",
+    "require": {
+        "php": "~7.0.0|7.0.2|7.0.4|~7.0.6|~7.1.0|~7.2.0|~7.3.0"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Returnless\\Connector\\": ""
+        }
+    },
+    "version": "0.0.1"
+}
