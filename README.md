@@ -40,7 +40,7 @@ Enter the following details:
 
 
 ## About Returnless ##
-With Returnless, you can easily automize and optimize your return proces by setting up a custom return form for your e-commerce webshop. We can help you to reduce your returns costs and -percentage, while making your consumers happy with a unique return experience.
+With Returnless, you can easily automate and optimize your return proces by setting up a custom return form for your e-commerce webshop. We can help you to reduce your returns costs and -percentage, while making your consumers happy with a unique return experience.
 
 Using the Returnless Connector for Magento 2, you can connect your return form with your Magento 2 backend, so that we can load the order information from your store. A customer will enter the order increment ID + customer emailaddress so that we can load all relevent order items related to the order. To use the Magento Connector, you will need a [Pro subscription](https://www.returnless.com/tarieven) for Returnless.
   
