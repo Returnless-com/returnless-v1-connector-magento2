@@ -6,8 +6,6 @@
 
 ***
 
-## Installation & Update the Returnless Connector ##
-
 <h2>Install using Composer</h2>
 Step-by-step to install the Returnless Connector for Magento® 2 by Composer:
 
