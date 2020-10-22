@@ -72,45 +72,58 @@ class OrderInfo implements OrderInfoInterface
     {
         $response['return_code'] = 112;
         $response['return_message'] = '';
+        $orderInfo = [];
 
         $this->logger->debug('Increment Id', [$incrementId]);
 
         try {
             $order = $this->getOrderByIncrementId($incrementId);
 
-            $orderProducts['id'] = $order->getIncrementId();
-            $orderProducts['order_id'] = $order->getEntityId();
-            $orderProducts['create_at']['value'] = $order->getCreatedAt();
+            $orderInfo['id'] = $order->getIncrementId();
+            $orderInfo['order_id'] = $order->getEntityId();
+            $orderInfo['create_at']['value'] = $order->getCreatedAt();
 
-            $orderProducts['customer']['id'] = $order->getCustomerId();
-            $orderProducts['customer']['email'] = $order->getCustomerEmail();
+            $orderInfo['customer']['id'] = $order->getCustomerId();
+            $orderInfo['customer']['email'] = $order->getCustomerEmail();
 
-            $this->logger->debug('Order Id', [$orderProducts['order_id']]);
-            $this->logger->debug('Customer Email', [$orderProducts['customer']['email']]);
+            $this->logger->debug('Order Id', [$orderInfo['order_id']]);
+            $this->logger->debug('Customer Email', [$orderInfo['customer']['email']]);
+
+            $billingAddress = $order->getBillingAddress();
+            if ($billingAddress) {
+                $orderInfo['billing_address']['first_name'] = $billingAddress->getFirstname();
+                $orderInfo['billing_address']['last_name'] = $billingAddress->getLastname();
+                $orderInfo['billing_address']['postcode'] = $billingAddress->getPostcode();
+                $orderInfo['billing_address']['city'] = $billingAddress->getCity();
+                $street = $billingAddress->getStreet();
+                $orderInfo['billing_address']['address1'] = isset($street[0]) ? $street[0] : '';
+                $orderInfo['billing_address']['address2'] = isset($street[1]) ? $street[1] : '';
+                $orderInfo['billing_address']['addition'] = isset($street[2]) ? $street[2] : '';
+            }
 
             $orderItems = $order->getAllVisibleItems();
 
             $this->logger->debug('Order has items', [count($orderItems)]);
 
             foreach ($orderItems as $orderItemKey => $orderItem) {
-                $orderProducts['order_products'][$orderItemKey]['product_id'] = $orderItem->getProductId();
-                $orderProducts['order_products'][$orderItemKey]['quantity'] = $orderItem->getQtyOrdered();
-                $orderProducts['order_products'][$orderItemKey]['order_product_id'] = $orderItem->getItemId();
-                $orderProducts['order_products'][$orderItemKey]['price_inc_tax'] = $orderItem->getPriceInclTax();
-                $orderProducts['order_products'][$orderItemKey]['model'] = $orderItem->getSku();
+                $orderInfo['order_products'][$orderItemKey]['product_id'] = $orderItem->getProductId();
+                $orderInfo['order_products'][$orderItemKey]['quantity'] = $orderItem->getQtyOrdered();
+                $orderInfo['order_products'][$orderItemKey]['order_product_id'] = $orderItem->getItemId();
+                $orderInfo['order_products'][$orderItemKey]['price_inc_tax'] = $orderItem->getPriceInclTax();
+                $orderInfo['order_products'][$orderItemKey]['model'] = $orderItem->getSku();
 
                 $product = $this->getProductById($orderItem->getProductId());
 
-                $orderProducts['order_products'][$orderItemKey]['name'] = $product->getName();
-                $orderProducts['order_products'][$orderItemKey]['images'][0]['http_path'] = $this->getImageByProduct($product);
-                $orderProducts['order_products'][$orderItemKey]['images'][1]['http_path'] = $this->getImageByProduct1($product);
-                $orderProducts['order_products'][$orderItemKey]['url'] = $product->getProductUrl();
-                $orderProducts['order_products'][$orderItemKey]['categories_ids'] = $product->getCategoryIds();
-                $orderProducts['order_products'][$orderItemKey]['u_brand'] = $product->getBrand();
+                $orderInfo['order_products'][$orderItemKey]['name'] = $product->getName();
+                $orderInfo['order_products'][$orderItemKey]['images'][0]['http_path'] = $this->getImageByProduct($product);
+                $orderInfo['order_products'][$orderItemKey]['images'][1]['http_path'] = $this->getImageByProduct1($product);
+                $orderInfo['order_products'][$orderItemKey]['url'] = $product->getProductUrl();
+                $orderInfo['order_products'][$orderItemKey]['categories_ids'] = $product->getCategoryIds();
+                $orderInfo['order_products'][$orderItemKey]['u_brand'] = $product->getBrand();
             }
 
             $response['return_code'] = 0;
-            $response['result'] = $orderProducts;
+            $response['result'] = $orderInfo;
         } catch (\Exception $e) {
             $response['return_message'] = $e->getMessage();
             $this->logger->debug($e->getMessage());
