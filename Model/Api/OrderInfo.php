@@ -12,10 +12,15 @@ use Magento\Catalog\Helper\Image;
 /**
  * Interface OrderInfo
  *
- * How to check logs: grep -rn 'returnless' var/log/debug.log
+ * How to check logs: grep -rn 'returnless' var/log/system.log
  */
 class OrderInfo implements OrderInfoInterface
 {
+    /**
+     * @var bool
+     */
+    protected $returnFlag = false;
+
     /**
      * @var LoggerInterface
      *
@@ -129,7 +134,23 @@ class OrderInfo implements OrderInfoInterface
             $this->logger->debug($e->getMessage());
         }
 
+        if ($this->returnFlag) {
+            return $response;
+        }
+
         $this->returnResult($response);
+    }
+
+    /**
+     * This method provides an ability to return Response Data
+     *
+     * @return $this
+     */
+    public function setReturnFlag()
+    {
+        $this->returnFlag = true;
+
+        return $this;
     }
 
     /**
