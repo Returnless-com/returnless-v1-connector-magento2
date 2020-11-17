@@ -7,7 +7,7 @@
 <h2>Install using Composer</h2>
 Step-by-step to install the Returnless Connector for Magento® 2 by Composer:
 
-1. Open your your SSH Console to connect to your Magento® 2 store. Once connected, locate the root of your Magento® 2 store.
+1. Open your SSH Console to connect to your Magento® 2 store. Once connected, locate the root of your Magento® 2 store.
 
 2. Enter the command line in your Root and wait as composer will download the extension for you:
 
