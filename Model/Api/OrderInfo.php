@@ -8,6 +8,7 @@ use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Psr\Log\LoggerInterface;
 use Magento\Catalog\Helper\Image;
+use Returnless\Connector\Model\Config;
 
 /**
  * Interface OrderInfo
@@ -48,6 +49,11 @@ class OrderInfo implements OrderInfoInterface
     protected $image;
 
     /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
      * OrderInfo constructor.
      *
      * @param OrderRepository $orderRepository
@@ -55,19 +61,22 @@ class OrderInfo implements OrderInfoInterface
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param LoggerInterface $logger
      * @param Image $image
+     * @param Config $config
      */
     public function __construct(
         OrderRepository $orderRepository,
         ProductRepository $productRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         LoggerInterface $logger,
-        Image $image
+        Image $image,
+        Config $config
     ) {
         $this->orderRepository = $orderRepository;
         $this->productRepository = $productRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->logger = $logger->withName('returnless');
         $this->image = $image;
+        $this->config = $config;
     }
 
     /**
@@ -101,6 +110,7 @@ class OrderInfo implements OrderInfoInterface
                 $orderInfo['billing_address']['postcode'] = $billingAddress->getPostcode();
                 $orderInfo['billing_address']['city'] = $billingAddress->getCity();
                 $street = $billingAddress->getStreet();
+                $orderInfo['billing_address']['country']['code2'] = $billingAddress->getCountryId();
                 $orderInfo['billing_address']['address1'] = isset($street[0]) ? $street[0] : '';
                 $orderInfo['billing_address']['address2'] = isset($street[1]) ? $street[1] : '';
                 $orderInfo['billing_address']['addition'] = isset($street[2]) ? $street[2] : '';
@@ -125,6 +135,13 @@ class OrderInfo implements OrderInfoInterface
                 $orderInfo['order_products'][$orderItemKey]['url'] = $product->getProductUrl();
                 $orderInfo['order_products'][$orderItemKey]['categories_ids'] = $product->getCategoryIds();
                 $orderInfo['order_products'][$orderItemKey]['u_brand'] = $product->getBrand();
+
+                $eavAttributeCode = $this->config->getEanAttributeCode();
+
+                $orderInfo['order_products'][$orderItemKey]['u_upc'] = null;
+                if (!empty($eavAttributeCode)) {
+                    $orderInfo['order_products'][$orderItemKey]['u_upc'] = $product->getData($eavAttributeCode);
+                }
             }
 
             $response['return_code'] = 0;

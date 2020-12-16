@@ -26,6 +26,11 @@ class Config
     const CONFIG_PATH_API_PASSWORD = 'returnless_connector/general/integration_api_password';
 
     /**
+     * const CONFIG_EAN_ATTRIBUTE_CODE
+     */
+    const CONFIG_EAN_ATTRIBUTE_CODE = 'returnless_connector/general/u_upc';
+
+    /**
      * Config constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
@@ -64,5 +69,20 @@ class Config
         );
 
         return $apiPassword;
+    }
+
+    /**
+     * @param null $store
+     * @return string
+     */
+    public function getEanAttributeCode($store = null)
+    {
+        $eanAttributeCode = (string)$this->scopeConfig->getValue(
+            self::CONFIG_EAN_ATTRIBUTE_CODE,
+            ScopeInterface::SCOPE_STORE,
+            $store
+        );
+
+        return $eanAttributeCode;
     }
 }
