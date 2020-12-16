@@ -7,7 +7,7 @@
 <h2>Install using Composer</h2>
 Step-by-step to install the Returnless Connector for Magento® 2 by Composer:
 
-1. Open your your SSH Console to connect to your Magento® 2 store. Once connected, locate the root of your Magento® 2 store.
+1. Open your SSH Console to connect to your Magento® 2 store. Once connected, locate the root of your Magento® 2 store.
 
 2. Enter the command line in your Root and wait as composer will download the extension for you:
 
@@ -27,16 +27,13 @@ php bin/magento cache:clean
 php bin/magento setup:static-content:deploy
 </pre>
 
-5. Create a new integration Authentication token to give us access to your store. 
-In your Magento® 2 backend, go to <strong>System > Integrations</strong> and click <strong>Add New Integration</strong>.
+5. Enter your API Credentials in the Magento 2 backend. 
+In your Magento® 2 backend, go to <strong>Stores > Configuration</strong> and click <strong>Connector API</strong> in the Returnless menu.
 Enter the following details:
-- Name: Returnless Connector
-- Your password: your admin password
-- (API tab) Resource Access: All
+- Enabled: Yes
+- Integration API Password (which you retrieved from our Return Portal or from your contactperson).
 
-6. Save the integration. Click <strong>Activate</strong> and click <strong>Allow</strong>.
-
-7. Save the <i>Access Token</i> and send it to your Returnless contact person so we can connect the return form to your store.
+6. Save the Configuration.
 
  
 ## About Returnless ##
