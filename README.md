@@ -54,7 +54,7 @@ Using the Returnless Connector for Magento 2, you can connect your return form w
 
 
 ## Configuration, FAQ and Troubleshooting  ##
-If you experience problems with the extension installation, setup or whenever you need more information about how to setup the Returnless Connector extension in Magento 2.2.x and higher, please send an e-mail to [developer@returnless.com](mailto:info@returnless.com) and we will help you through the process.
+If you experience problems with the extension installation, setup or whenever you need more information about how to setup the Returnless Connector extension in Magento 2.3.x and higher, please send an e-mail to [developer@returnless.com](mailto:info@returnless.com) and we will help you through the process.
 
 
 ## License ##
