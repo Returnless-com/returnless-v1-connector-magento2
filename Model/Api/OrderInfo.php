@@ -80,7 +80,7 @@ class OrderInfo implements OrderInfoInterface
         $this->orderRepository = $orderRepository;
         $this->productRepository = $productRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->logger = $logger->withName('returnless');
+        $this->logger = $logger;
         $this->image = $image;
         $this->config = $config;
     }
@@ -94,7 +94,7 @@ class OrderInfo implements OrderInfoInterface
         $response['return_message'] = '';
         $orderInfo = [];
 
-        $this->logger->debug('Increment Id', [$incrementId]);
+        $this->logger->debug('[RET_ORDER_INFO] Increment Id', [$incrementId]);
 
         try {
             $order = $this->getOrderByIncrementId($incrementId);
@@ -106,8 +106,8 @@ class OrderInfo implements OrderInfoInterface
             $orderInfo['customer']['id'] = $order->getCustomerId();
             $orderInfo['customer']['email'] = $order->getCustomerEmail();
 
-            $this->logger->debug('Order Id', [$orderInfo['order_id']]);
-            $this->logger->debug('Customer Email', [$orderInfo['customer']['email']]);
+            $this->logger->debug('[RET_ORDER_INFO] Order Id', [$orderInfo['order_id']]);
+            $this->logger->debug('[RET_ORDER_INFO] Customer Email', [$orderInfo['customer']['email']]);
 
             $billingAddress = $order->getBillingAddress();
             if ($billingAddress) {
@@ -120,12 +120,13 @@ class OrderInfo implements OrderInfoInterface
                 $orderInfo['billing_address']['address1'] = isset($street[0]) ? $street[0] : '';
                 $orderInfo['billing_address']['address2'] = isset($street[1]) ? $street[1] : '';
                 $orderInfo['billing_address']['addition'] = isset($street[2]) ? $street[2] : '';
+                $orderInfo['customer']['phone'] = $billingAddress->getTelephone();
             }
 
             $separateBundle = $this->config->getSeparateBundle();
             $orderItems = $separateBundle ? $order->getAllItems() : $order->getAllVisibleItems();
 
-            $this->logger->debug('Order has items', [count($orderItems)]);
+            $this->logger->debug('[RET_ORDER_INFO] Order has items', [count($orderItems)]);
 
             foreach ($orderItems as $orderItemKey => $orderItem) {
                 if ($orderItem->getParentItemId()) {
@@ -213,7 +214,7 @@ class OrderInfo implements OrderInfoInterface
             $response['result'] = $orderInfo;
         } catch (\Exception $e) {
             $response['return_message'] = $e->getMessage();
-            $this->logger->debug($e->getMessage());
+            $this->logger->debug("[RET_ORDER_INFO] " . $e->getMessage());
         }
 
         if ($this->returnFlag) {

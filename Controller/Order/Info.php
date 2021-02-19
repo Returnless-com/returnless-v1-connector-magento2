@@ -57,7 +57,7 @@ class Info extends Action
     ) {
         $this->orderInfo = $orderInfo;
         $this->config = $config;
-        $this->logger = $logger->withName('returnless');
+        $this->logger = $logger;
 
         return parent::__construct($context);
     }
@@ -115,7 +115,7 @@ class Info extends Action
     protected function setResponse($message = '', $code = 0, $debug = false)
     {
         if ($debug) {
-            $this->logger->notice($message);
+            $this->logger->notice("[RET_ORDER_INFO] " . $message);
         }
 
         $this->response['return_code'] = $code;
