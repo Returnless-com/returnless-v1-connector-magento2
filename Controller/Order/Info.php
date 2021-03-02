@@ -153,6 +153,10 @@ class Info extends Action
     {
         header("Content-Type: application/json; charset=utf-8");
 
+        if (isset($result['installed_module_version']) && !empty($result['installed_module_version'])) {
+            $this->response['installed_module_version'] = $result['installed_module_version'];
+        }
+
         if (isset($result['result']) && !empty($result['result'])) {
             $this->response['result'] = $result['result'];
         }

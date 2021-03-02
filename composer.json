@@ -3,7 +3,7 @@
     "description": "Returnless Connector",
     "type": "magento2-module",
     "require": {
-        "php": "~7.0.0|7.0.2|7.0.4|~7.0.6|~7.1.0|~7.2.0|~7.3.0"
+        "php": "~7.0.0|7.0.2|7.0.4|~7.0.6|~7.1.0|~7.2.0|~7.3.0|~7.4.0"
     },
     "autoload": {
         "files": [
@@ -17,5 +17,5 @@
         "OSL-3.0",
         "AFL-3.0"
     ],
-    "version": "1.0.6"
+    "version": "1.0.7"
 }

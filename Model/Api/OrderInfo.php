@@ -2,6 +2,7 @@
 
 namespace Returnless\Connector\Model\Api;
 
+use Magento\Framework\Module\ResourceInterface;
 use Returnless\Connector\Api\OrderInfoInterface;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Catalog\Model\ProductRepository;
@@ -22,6 +23,16 @@ class OrderInfo implements OrderInfoInterface
      * const PRODUCT_TYPE_BUNDLE
      */
     const PRODUCT_TYPE_BUNDLE = 'bundle';
+
+    /**
+     * const NAMESPACE_MODULE
+     */
+    const NAMESPACE_MODULE = 'Returnless_Connector';
+
+    /**
+     * @var ResourceInterface
+     */
+    protected $moduleResource;
 
     /**
      * @var bool
@@ -68,6 +79,7 @@ class OrderInfo implements OrderInfoInterface
      * @param LoggerInterface $logger
      * @param Image $image
      * @param Config $config
+     * @param ResourceInterface $moduleResource
      */
     public function __construct(
         OrderRepository $orderRepository,
@@ -75,7 +87,8 @@ class OrderInfo implements OrderInfoInterface
         SearchCriteriaBuilder $searchCriteriaBuilder,
         LoggerInterface $logger,
         Image $image,
-        Config $config
+        Config $config,
+        ResourceInterface $moduleResource
     ) {
         $this->orderRepository = $orderRepository;
         $this->productRepository = $productRepository;
@@ -83,6 +96,7 @@ class OrderInfo implements OrderInfoInterface
         $this->logger = $logger;
         $this->image = $image;
         $this->config = $config;
+        $this->moduleResource = $moduleResource;
     }
 
     /**
@@ -92,6 +106,7 @@ class OrderInfo implements OrderInfoInterface
     {
         $response['return_code'] = 112;
         $response['return_message'] = '';
+        $response['installed_module_version'] = $this->moduleResource->getDbVersion(self::NAMESPACE_MODULE);
         $orderInfo = [];
 
         $this->logger->debug('[RET_ORDER_INFO] Increment Id', [$incrementId]);
