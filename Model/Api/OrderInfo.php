@@ -269,60 +269,26 @@ class OrderInfo implements OrderInfoInterface
 
     /**
      * @param $product
-     * @return mixed
-     */
-    public function doesProductHaveImage($product)
-    {
-        $image = false;
-
-        if (!$product || !$product->getId()) {
-            return $image;
-        }
-
-        $image = $product->getImage();
-
-        if (empty($image) || $image == 'no_selection') {
-            $image = $product->getSmallImage();
-        }
-
-        if (empty($image) || $image == 'no_selection') {
-            $image = $product->getThumbnail();
-        }
-
-        return (empty($image) || $image == 'no_selection') ? false : true;
-    }
-
-    /**
-     * @param $product
      * @return bool
      */
     public function getImageByProduct1($product)
     {
-        $image = false;
-
-        $productHasImage = $this->doesProductHaveImage($product);
-
-        if ($productHasImage) {
-            $mediaGalleryImages = $product->getMediaGalleryImages();
-
-            $image = $mediaGalleryImages->getFirstItem()->getUrl();
-        }
+        $mediaGalleryImages = $product->getMediaGalleryImages();
+        $image = $mediaGalleryImages->getFirstItem()->getUrl();
 
         return $image;
     }
 
+    /**
+     * @param $product
+     * @return bool|string
+     */
     public function getImageByProduct($product)
     {
-        $image = false;
-
-        $productHasImage = $this->doesProductHaveImage($product);
-
-        if ($productHasImage) {
-            $image = $this->image
-                ->init($product, 'product_page_image_large')
-                ->setImageFile($product->getImage())
-                ->getUrl();
-        }
+        $image = $this->image
+            ->init($product, 'product_page_image_large')
+            ->setImageFile($product->getImage())
+            ->getUrl();
 
         return $image;
     }

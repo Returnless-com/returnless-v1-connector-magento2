@@ -5,7 +5,7 @@
         <returnless_connector>
             <general>
                 <enabled>1</enabled>
-                <integration_api_password backend_model="Magento\Config\Model\Config\Backend\Encrypted" ><![CDATA[0:3:GYPxbV49zVR1PoaSzMfZ36rYjrnGQIrSrKI066/AQMlTRoiL7Xzdaoqp99CQpWqwxzkhj1DHrh4eJR0v]]></integration_api_password>
+                <integration_api_password backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
             </general>
         </returnless_connector>
     </default>
