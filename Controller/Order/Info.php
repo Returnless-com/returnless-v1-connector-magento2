@@ -80,12 +80,19 @@ class Info extends Action
 
         // get Signature from Header
         $returnlessSignature = $this->getSignatureFromHeader();
+
+        // get Signature from Url
+        if (empty($returnlessSignature)) {
+            $returnlessSignature = $this->getSignatureFromUrl();
+        }
+
+        // 1 validate Signature
         if (empty($returnlessSignature)) {
             $this->setResponse("Can't find header: '" . self::HEADER_SIGNATURE . "'", 401, true)
                 ->returnResponse();
         }
 
-        // validate Signature
+        // 2 validate Signature
         $incrementId = $this->getRequest()->getParam('increment_id');
         $integrationApiPassword = $this->config->getApiPassword();
         $hashedSignature = hash_hmac("sha256" , $incrementId , $integrationApiPassword);
@@ -133,12 +140,24 @@ class Info extends Action
     {
         $returnlessSignature = false;
 
-        if (empty($returnlessSignature)) {
-            $allheaders = getallheaders();
+        if (!empty($this->getRequest()->getHeader(self::HEADER_SIGNATURE))) {
+            $returnlessSignature = $this->getRequest()->getHeader(self::HEADER_SIGNATURE);
         }
 
-        if (isset($allheaders[self::HEADER_SIGNATURE])) {
-            $returnlessSignature =  $allheaders[self::HEADER_SIGNATURE];
+        return $returnlessSignature;
+    }
+
+    /**
+     * Get Signature form Url
+     *
+     * @return bool|mixed
+     */
+    protected function getSignatureFromUrl()
+    {
+        $returnlessSignature = false;
+
+        if (!empty($this->getRequest()->getParam(self::HEADER_SIGNATURE))) {
+            $returnlessSignature = $this->getRequest()->getParam(self::HEADER_SIGNATURE);
         }
 
         return $returnlessSignature;
