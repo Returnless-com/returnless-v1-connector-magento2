@@ -138,6 +138,20 @@ class OrderInfo implements OrderInfoInterface
                 $orderInfo['customer']['phone'] = $billingAddress->getTelephone();
             }
 
+            $shippingAddress = $order->getShippingAddress();
+            if ($shippingAddress) {
+                $orderInfo['shipping_address']['first_name'] = $shippingAddress->getFirstname();
+                $orderInfo['shipping_address']['last_name'] = $shippingAddress->getLastname();
+                $orderInfo['shipping_address']['postcode'] = $shippingAddress->getPostcode();
+                $orderInfo['shipping_address']['city'] = $shippingAddress->getCity();
+                $street1 = $shippingAddress->getStreet();
+                $orderInfo['shipping_address']['country']['code2'] = $shippingAddress->getCountryId();
+                $orderInfo['shipping_address']['address1'] = isset($street1[0]) ? $street1[0] : '';
+                $orderInfo['shipping_address']['address2'] = isset($street1[1]) ? $street1[1] : '';
+                $orderInfo['shipping_address']['addition'] = isset($street1[2]) ? $street1[2] : '';
+                $orderInfo['customer']['phone'] = $shippingAddress->getTelephone();
+            }
+
             $separateBundle = $this->config->getSeparateBundle();
             $orderItems = $separateBundle ? $order->getAllItems() : $order->getAllVisibleItems();
 
