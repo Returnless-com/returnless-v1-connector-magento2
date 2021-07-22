@@ -1,4 +1,15 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Returnless\Connector\Api\OrderInfoInterface" type="Returnless\Connector\Model\Api\OrderInfo" />
+    <type name="Returnless\Connector\Model\PartnersSourceAdapter">
+        <arguments>
+                <argument name="partnersResource" xsi:type="array">
+                    <item name="vendiro" xsi:type="array">
+                        <item name="label" xsi:type="string">Vendiro</item>
+                        <item name="keyForSearch" xsi:type="string">marketplace_orderid</item>
+                        <item name="model" xsi:type="object">TIG\Vendiro\Model\ResourceModel\Order\Collection</item>
+                    </item>
+                </argument>
+        </arguments>
+    </type>
 </config>

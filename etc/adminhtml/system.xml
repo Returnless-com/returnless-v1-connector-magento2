@@ -34,6 +34,17 @@
                     <comment><![CDATA[Separation of bundles will be enabled.]]></comment>
                 </field>
             </group>
+            <group id="marketplace_orders" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Marketplace Orders</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Search for Marketplace Order</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="integration_partner" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Integration Partner</label>
+                    <source_model>Returnless\Connector\Model\Config\Source\IntegrationPartner</source_model>
+                </field>
+            </group>
         </section>
     </system>
 </config>

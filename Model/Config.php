@@ -36,6 +36,16 @@ class Config
     const CONFIG_SEPARATE_BUNDLE_PRODUCTS = 'returnless_connector/general/bundle_enabled';
 
     /**
+     * const Path to config enabled marketplace search
+     */
+    const CONFIG_MARKETPLACE_SEARCH_ENABLED = 'returnless_connector/marketplace_orders/enabled';
+
+    /**
+     * const Path to config marketplace integration partner
+     */
+    const CONFIG_MARKETPLACE_SEARCH_VENDOR_ID = 'returnless_connector/marketplace_orders/integration_partner';
+
+    /**
      * Config constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
@@ -54,6 +64,36 @@ class Config
     {
         $enabled = (string)$this->scopeConfig->getValue(
             self::CONFIG_PATH_API_ENABLED,
+            ScopeInterface::SCOPE_STORE,
+            $store
+        );
+
+        return $enabled;
+    }
+
+    /**
+     * @param null $store
+     * @return string
+     */
+    public function getMarketplaceSearchEnabled($store = null)
+    {
+        $enabled = (string)$this->scopeConfig->getValue(
+            self::CONFIG_MARKETPLACE_SEARCH_ENABLED,
+            ScopeInterface::SCOPE_STORE,
+            $store
+        );
+
+        return $enabled;
+    }
+
+    /**
+     * @param null $store
+     * @return string
+     */
+    public function getMarketplaceSearchPartnerId($store = null)
+    {
+        $enabled = (string)$this->scopeConfig->getValue(
+            self::CONFIG_MARKETPLACE_SEARCH_VENDOR_ID,
             ScopeInterface::SCOPE_STORE,
             $store
         );

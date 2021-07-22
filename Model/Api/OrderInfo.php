@@ -2,15 +2,16 @@
 
 namespace Returnless\Connector\Model\Api;
 
-use Magento\Framework\Module\ResourceInterface;
-use Returnless\Connector\Api\OrderInfoInterface;
-use Magento\Sales\Model\OrderRepository;
-use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Module\ResourceInterface;
+use Magento\Sales\Model\OrderRepository;
+use Returnless\Connector\Api\OrderInfoInterface;
+use Magento\Catalog\Model\ProductRepository;
 use Psr\Log\LoggerInterface;
 use Magento\Catalog\Helper\Image;
 use Returnless\Connector\Model\Config;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\App\ObjectManager;
 
 /**
  * Interface OrderInfo
@@ -46,19 +47,9 @@ class OrderInfo implements OrderInfoInterface
     protected $logger;
 
     /**
-     * @var OrderRepository
-     */
-    protected $orderRepository;
-
-    /**
      * @var ProductRepository
      */
     protected $productRepository;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    protected $searchCriteriaBuilder;
 
     /**
      * @var Image
@@ -71,32 +62,43 @@ class OrderInfo implements OrderInfoInterface
     protected $config;
 
     /**
+     * @var OrderRepository
+     */
+    protected $orderRepository;
+
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    protected $searchCriteriaBuilder;
+
+    /**
      * OrderInfo constructor.
      *
-     * @param OrderRepository $orderRepository
      * @param ProductRepository $productRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param LoggerInterface $logger
      * @param Image $image
      * @param Config $config
      * @param ResourceInterface $moduleResource
+     * @param OrderRepository $orderRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(
-        OrderRepository $orderRepository,
         ProductRepository $productRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
         LoggerInterface $logger,
         Image $image,
         Config $config,
-        ResourceInterface $moduleResource
-    ) {
-        $this->orderRepository = $orderRepository;
+        ResourceInterface $moduleResource,
+        OrderRepository $orderRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder
+    )
+    {
         $this->productRepository = $productRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->logger = $logger;
         $this->image = $image;
         $this->config = $config;
         $this->moduleResource = $moduleResource;
+        $this->orderRepository = $orderRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
@@ -112,7 +114,12 @@ class OrderInfo implements OrderInfoInterface
         $this->logger->debug('[RET_ORDER_INFO] Increment Id', [$incrementId]);
 
         try {
-            $order = $this->getOrderByIncrementId($incrementId);
+            $order = $this->getOrderByMagento($incrementId);
+            if (!$order->getId() && $this->config->getMarketplaceSearchEnabled()) {
+                /** @var \Returnless\Connector\Model\PartnersSourceAdapter $partnersSourceAdapter */
+                $partnersSourceAdapter = ObjectManager::getInstance()->get('Returnless\Connector\Model\PartnersSourceAdapter');
+                $order = $partnersSourceAdapter->getOrderByMarketplace($incrementId);
+            }
 
             $orderInfo['id'] = $order->getIncrementId();
             $orderInfo['order_id'] = $order->getEntityId();
@@ -254,6 +261,24 @@ class OrderInfo implements OrderInfoInterface
     }
 
     /**
+     * @param $incrementId
+     * @param string $searchKey
+     * @return \Magento\Framework\DataObject
+     */
+    private function getOrderByMagento($incrementId, $searchKey = 'increment_id')
+    {
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter(
+                $searchKey,
+                $incrementId,
+                'eq'
+            )
+            ->create();
+
+        return $this->orderRepository->getList($searchCriteria)->getFirstItem();
+    }
+
+    /**
      * This method provides an ability to return Response Data
      *
      * @return $this
@@ -305,23 +330,6 @@ class OrderInfo implements OrderInfoInterface
             ->getUrl();
 
         return $image;
-    }
-
-    /**
-     * @param $incrementId
-     * @return mixed
-     */
-    protected function getOrderByIncrementId($incrementId)
-    {
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter(
-                'increment_id',
-                $incrementId,
-                'eq'
-            )
-            ->create();
-
-        return $this->orderRepository->getList($searchCriteria)->getFirstItem();
     }
 
     /**
