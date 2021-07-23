@@ -124,6 +124,12 @@ class OrderInfo implements OrderInfoInterface
             $orderInfo['id'] = $order->getIncrementId();
             $orderInfo['order_id'] = $order->getEntityId();
             $orderInfo['create_at']['value'] = $order->getCreatedAt();
+            
+            $payment = $order->getPayment();
+            $method = $payment->getMethodInstance();
+            $methodTitle = $method->getTitle();
+            
+            $orderInfo['payment_method']['name'] = $methodTitle;
 
             $orderInfo['customer']['id'] = $order->getCustomerId();
             $orderInfo['customer']['email'] = $order->getCustomerEmail();
