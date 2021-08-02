@@ -209,7 +209,7 @@ class OrderInfo implements OrderInfoInterface
                             $product = $this->getProductById($bundleChildren->getProductId());
 
                             if ($product) {
-                                $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['cost'] = $product->getPrice();
+                                $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['cost'] = $product->getCost();
                                 $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['name'] = $product->getName();
                                 $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['images'][0]['http_path'] = $this->getImageByProduct($product);
                                 $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['images'][1]['http_path'] = $this->getImageByProduct1($product);
@@ -233,7 +233,7 @@ class OrderInfo implements OrderInfoInterface
                 $product = $this->getProductById($orderItem->getProductId());
 
                 if ($product) {
-                    $orderInfo['order_products'][$orderItemKey]['cost'] = $product->getPrice();
+                    $orderInfo['order_products'][$orderItemKey]['cost'] = $product->getCost();
                     $orderInfo['order_products'][$orderItemKey]['name'] = $product->getName();
                     $orderInfo['order_products'][$orderItemKey]['images'][0]['http_path'] = $this->getImageByProduct($product);
                     $orderInfo['order_products'][$orderItemKey]['images'][1]['http_path'] = $this->getImageByProduct1($product);
