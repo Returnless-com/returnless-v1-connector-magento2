@@ -126,11 +126,13 @@ class OrderInfo implements OrderInfoInterface
             $orderInfo['create_at']['value'] = $order->getCreatedAt();
             
             $payment = $order->getPayment();
-            $method = $payment->getMethodInstance();
-            $methodTitle = $method->getTitle();
+            $methodTitle = '';
+            if($payment) {
+                $method = $payment->getMethodInstance();
+                $methodTitle = $method->getTitle();
+                $orderInfo['payment_method']['name'] = $methodTitle;
+            }
             
-            $orderInfo['payment_method']['name'] = $methodTitle;
-
             $orderInfo['customer']['id'] = $order->getCustomerId();
             $orderInfo['customer']['email'] = $order->getCustomerEmail();
 
@@ -182,7 +184,7 @@ class OrderInfo implements OrderInfoInterface
                 $orderInfo['order_products'][$orderItemKey]['price'] = $orderItem->getBasePrice();
                 $orderInfo['order_products'][$orderItemKey]['discount_amount'] = $orderItem->getDiscountAmount();
                 $orderInfo['order_products'][$orderItemKey]['price_inc_tax'] = $orderItem->getPriceInclTax();
-                $orderInfo['order_products'][$orderItemKey]['total_amount'] = $orderItem->getRowTotalInclTax();
+                $orderInfo['order_products'][$orderItemKey]['total_price'] = $orderItem->getRowTotalInclTax();
                 $orderInfo['order_products'][$orderItemKey]['model'] = $orderItem->getSku();
 
                 $itemType = $orderItem->getProductType();
@@ -203,7 +205,7 @@ class OrderInfo implements OrderInfoInterface
                             $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['price'] = $bundleChildren->getBasePrice();
                             $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['discount_amount'] = $bundleChildren->getDiscountAmount();
                             $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['price_inc_tax'] = $bundleChildren->getPriceInclTax();
-                            $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['total_amount'] = $bundleChildren->getRowTotalInclTax();
+                            $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['total_price'] = $bundleChildren->getRowTotalInclTax();
                             $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['model'] = $bundleChildren->getSku();
 
                             $product = $this->getProductById($bundleChildren->getProductId());
