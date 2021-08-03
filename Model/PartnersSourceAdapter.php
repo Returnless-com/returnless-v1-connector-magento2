@@ -94,7 +94,7 @@ class PartnersSourceAdapter
         )
             ->addFieldToSelect('order_id')
             ->getFirstItem();
-        $order =  $this->getOrderByMagento($partnerOrder->getOrderId(), 'entity_id');
+        $order =  $this->getOrderByMagento($partnerOrder->getOrderId(), 'increment_id');
 
         return $order;
     }
