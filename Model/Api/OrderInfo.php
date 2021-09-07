@@ -2,14 +2,16 @@
 
 namespace Returnless\Connector\Model\Api;
 
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Module\ResourceInterface;
+use Magento\Sales\Model\OrderRepository;
 use Returnless\Connector\Api\OrderInfoInterface;
 use Magento\Catalog\Model\ProductRepository;
 use Psr\Log\LoggerInterface;
 use Magento\Catalog\Helper\Image;
 use Returnless\Connector\Model\Config;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Returnless\Connector\Model\PartnersSourceAdapter;
+use Magento\Framework\App\ObjectManager;
 
 /**
  * Interface OrderInfo
@@ -60,9 +62,14 @@ class OrderInfo implements OrderInfoInterface
     protected $config;
 
     /**
-     * @var PartnersSourceAdapter
+     * @var OrderRepository
      */
-    protected $partnersSourceAdapter;
+    protected $orderRepository;
+
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    protected $searchCriteriaBuilder;
 
     /**
      * OrderInfo constructor.
@@ -72,6 +79,8 @@ class OrderInfo implements OrderInfoInterface
      * @param Image $image
      * @param Config $config
      * @param ResourceInterface $moduleResource
+     * @param OrderRepository $orderRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      */
     public function __construct(
         ProductRepository $productRepository,
@@ -79,7 +88,8 @@ class OrderInfo implements OrderInfoInterface
         Image $image,
         Config $config,
         ResourceInterface $moduleResource,
-        PartnersSourceAdapter $partnersSourceAdapter
+        OrderRepository $orderRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder
     )
     {
         $this->productRepository = $productRepository;
@@ -87,7 +97,8 @@ class OrderInfo implements OrderInfoInterface
         $this->image = $image;
         $this->config = $config;
         $this->moduleResource = $moduleResource;
-        $this->partnersSourceAdapter = $partnersSourceAdapter;
+        $this->orderRepository = $orderRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
     /**
@@ -103,12 +114,25 @@ class OrderInfo implements OrderInfoInterface
         $this->logger->debug('[RET_ORDER_INFO] Increment Id', [$incrementId]);
 
         try {
-            $order = $this->partnersSourceAdapter->getOrderById($incrementId);
+            $order = $this->getOrderByMagento($incrementId);
+            if (!$order->getId() && $this->config->getMarketplaceSearchEnabled()) {
+                /** @var \Returnless\Connector\Model\PartnersSourceAdapter $partnersSourceAdapter */
+                $partnersSourceAdapter = ObjectManager::getInstance()->get('Returnless\Connector\Model\PartnersSourceAdapter');
+                $order = $partnersSourceAdapter->getOrderByMarketplace($incrementId);
+            }
 
             $orderInfo['id'] = $order->getIncrementId();
             $orderInfo['order_id'] = $order->getEntityId();
             $orderInfo['create_at']['value'] = $order->getCreatedAt();
-
+            
+            $payment = $order->getPayment();
+            $methodTitle = '';
+            if($payment) {
+                $method = $payment->getMethodInstance();
+                $methodTitle = $method->getTitle();
+                $orderInfo['payment_method']['name'] = $methodTitle;
+            }
+            
             $orderInfo['customer']['id'] = $order->getCustomerId();
             $orderInfo['customer']['email'] = $order->getCustomerEmail();
 
@@ -160,7 +184,7 @@ class OrderInfo implements OrderInfoInterface
                 $orderInfo['order_products'][$orderItemKey]['price'] = $orderItem->getBasePrice();
                 $orderInfo['order_products'][$orderItemKey]['discount_amount'] = $orderItem->getDiscountAmount();
                 $orderInfo['order_products'][$orderItemKey]['price_inc_tax'] = $orderItem->getPriceInclTax();
-                $orderInfo['order_products'][$orderItemKey]['total_amount'] = $orderItem->getRowTotalInclTax();
+                $orderInfo['order_products'][$orderItemKey]['total_price'] = $orderItem->getRowTotalInclTax();
                 $orderInfo['order_products'][$orderItemKey]['model'] = $orderItem->getSku();
                 $orderInfo['order_products'][$orderItemKey]['name'] = $orderItem->getName();
 
@@ -182,13 +206,13 @@ class OrderInfo implements OrderInfoInterface
                             $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['price'] = $bundleChildren->getBasePrice();
                             $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['discount_amount'] = $bundleChildren->getDiscountAmount();
                             $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['price_inc_tax'] = $bundleChildren->getPriceInclTax();
-                            $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['total_amount'] = $bundleChildren->getRowTotalInclTax();
+                            $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['total_price'] = $bundleChildren->getRowTotalInclTax();
                             $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['model'] = $bundleChildren->getSku();
 
                             $product = $this->getProductById($bundleChildren->getProductId());
 
                             if ($product) {
-                                $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['cost'] = $product->getPrice();
+                                $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['cost'] = $product->getCost();
                                 $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['name'] = $product->getName();
                                 $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['images'][0]['http_path'] = $this->getImageByProduct($product);
                                 $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['images'][1]['http_path'] = $this->getImageByProduct1($product);
@@ -212,7 +236,7 @@ class OrderInfo implements OrderInfoInterface
                 $product = $this->getProductById($orderItem->getProductId());
 
                 if ($product) {
-                    $orderInfo['order_products'][$orderItemKey]['cost'] = $product->getPrice();
+                    $orderInfo['order_products'][$orderItemKey]['cost'] = $product->getCost();
                     $orderInfo['order_products'][$orderItemKey]['images'][0]['http_path'] = $this->getImageByProduct($product);
                     $orderInfo['order_products'][$orderItemKey]['images'][1]['http_path'] = $this->getImageByProduct1($product);
                     $orderInfo['order_products'][$orderItemKey]['url'] = $product->getProductUrl();
@@ -240,6 +264,24 @@ class OrderInfo implements OrderInfoInterface
         }
 
         $this->returnResult($response);
+    }
+
+    /**
+     * @param $incrementId
+     * @param string $searchKey
+     * @return \Magento\Framework\DataObject
+     */
+    private function getOrderByMagento($incrementId, $searchKey = 'increment_id')
+    {
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter(
+                $searchKey,
+                $incrementId,
+                'eq'
+            )
+            ->create();
+
+        return $this->orderRepository->getList($searchCriteria)->getFirstItem();
     }
 
     /**
