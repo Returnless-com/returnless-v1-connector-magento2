@@ -12,6 +12,7 @@ use Magento\Catalog\Helper\Image;
 use Returnless\Connector\Model\Config;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\App\ObjectManager;
+use Magento\Weee\Helper\Data;
 
 /**
  * Interface OrderInfo
@@ -72,6 +73,11 @@ class OrderInfo implements OrderInfoInterface
     protected $searchCriteriaBuilder;
 
     /**
+     * @var Data
+     */
+    protected $weeeHelper;
+
+    /**
      * OrderInfo constructor.
      *
      * @param ProductRepository $productRepository
@@ -81,6 +87,7 @@ class OrderInfo implements OrderInfoInterface
      * @param ResourceInterface $moduleResource
      * @param OrderRepository $orderRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param Data $weeeHelper
      */
     public function __construct(
         ProductRepository $productRepository,
@@ -89,7 +96,8 @@ class OrderInfo implements OrderInfoInterface
         Config $config,
         ResourceInterface $moduleResource,
         OrderRepository $orderRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        Data $weeeHelper
     )
     {
         $this->productRepository = $productRepository;
@@ -99,6 +107,7 @@ class OrderInfo implements OrderInfoInterface
         $this->moduleResource = $moduleResource;
         $this->orderRepository = $orderRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->weeeHelper = $weeeHelper;
     }
 
     /**
@@ -106,8 +115,6 @@ class OrderInfo implements OrderInfoInterface
      */
     public function getOrderInfoReturnless($incrementId)
     {
-        $response['return_code'] = 112;
-        $response['return_message'] = '';
         $response['installed_module_version'] = $this->moduleResource->getDbVersion(self::NAMESPACE_MODULE);
         $orderInfo = [];
 
@@ -181,10 +188,15 @@ class OrderInfo implements OrderInfoInterface
                 $orderInfo['order_products'][$orderItemKey]['quantity'] = $orderItem->getQtyOrdered();
                 $orderInfo['order_products'][$orderItemKey]['order_product_id'] = $orderItem->getItemId();
 
-                $orderInfo['order_products'][$orderItemKey]['price'] = $orderItem->getBasePrice();
+                $orderInfo['order_products'][$orderItemKey]['price'] = $orderItem->getPrice();
                 $orderInfo['order_products'][$orderItemKey]['discount_amount'] = $orderItem->getDiscountAmount();
                 $orderInfo['order_products'][$orderItemKey]['price_inc_tax'] = $orderItem->getPriceInclTax();
-                $orderInfo['order_products'][$orderItemKey]['total_price'] = $orderItem->getRowTotalInclTax();
+                $totalPrice = $orderItem->getRowTotal()
+                    - $orderItem->getDiscountAmount()
+                    + $orderItem->getTaxAmount()
+                    + $orderItem->getDiscountTaxCompensationAmount()
+                    + $this->weeeHelper->getRowWeeeTaxInclTax($orderItem);
+                $orderInfo['order_products'][$orderItemKey]['total_price'] = $totalPrice;
                 $orderInfo['order_products'][$orderItemKey]['model'] = $orderItem->getSku();
                 $orderInfo['order_products'][$orderItemKey]['name'] = $orderItem->getName();
 
