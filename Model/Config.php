@@ -31,6 +31,11 @@ class Config
     const CONFIG_EAN_ATTRIBUTE_CODE = 'returnless_connector/general/u_upc';
 
     /**
+     * const CONFIG_BRAND_ATTRIBUTE_CODE
+     */
+    const CONFIG_BRAND_ATTRIBUTE_CODE = 'returnless_connector/general/u_brand';
+
+    /**
      * const CONFIG_SEPARATE_BUNDLE_PRODUCTS
      */
     const CONFIG_SEPARATE_BUNDLE_PRODUCTS = 'returnless_connector/general/bundle_enabled';
@@ -146,5 +151,20 @@ class Config
         );
 
         return $separateBundle;
+    }
+
+    /**
+     * @param null $store
+     * @return string
+     */
+    public function getBrandAttributeCode($store = null)
+    {
+        $brandttributeCode = (string)$this->scopeConfig->getValue(
+            self::CONFIG_BRAND_ATTRIBUTE_CODE,
+            ScopeInterface::SCOPE_STORE,
+            $store
+        );
+
+        return $brandttributeCode;
     }
 }

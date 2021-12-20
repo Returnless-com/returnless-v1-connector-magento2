@@ -230,7 +230,7 @@ class OrderInfo implements OrderInfoInterface
                                 $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['images'][1]['http_path'] = $this->getImageByProduct1($product);
                                 $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['url'] = $product->getProductUrl();
                                 $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['categories_ids'] = $product->getCategoryIds();
-                                $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['u_brand'] = $product->getBrand();
+                                $orderInfo['order_products'][$orderItemKey]['bundle_children'][$key]['u_brand'] = $this->getUBrand($product);
 
                                 $eavAttributeCode = $this->config->getEanAttributeCode();
 
@@ -253,7 +253,7 @@ class OrderInfo implements OrderInfoInterface
                     $orderInfo['order_products'][$orderItemKey]['images'][1]['http_path'] = $this->getImageByProduct1($product);
                     $orderInfo['order_products'][$orderItemKey]['url'] = $product->getProductUrl();
                     $orderInfo['order_products'][$orderItemKey]['categories_ids'] = $product->getCategoryIds();
-                    $orderInfo['order_products'][$orderItemKey]['u_brand'] = $product->getBrand();
+                    $orderInfo['order_products'][$orderItemKey]['u_brand'] = $this->getUBrand($product);
 
                     $eavAttributeCode = $this->config->getEanAttributeCode();
 
@@ -348,6 +348,25 @@ class OrderInfo implements OrderInfoInterface
             ->getUrl();
 
         return $image;
+    }
+
+    /**
+     * Method returns variable for Product's Brand Attribute
+     *
+     * @param $product
+     * @return null
+     */
+    protected function getUBrand($product)
+    {
+        $brandAttributeCode = $this->config->getBrandAttributeCode();
+        $brandAttributeCode = !empty($brandAttributeCode) ? $brandAttributeCode : null;
+
+        $uBrand = null;
+        if (!empty($brandAttributeCode)) {
+            $uBrand = $product->getResource()->getAttribute($brandAttributeCode)->getFrontend()->getValue($product);
+        }
+
+        return $uBrand ? $uBrand : null;
     }
 
     /**
