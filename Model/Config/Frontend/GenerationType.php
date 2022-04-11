@@ -31,7 +31,8 @@ class GenerationType extends Field
      */
     public function render(AbstractElement $element)
     {
-        if (strtolower($this->productMetadata->getEdition()) == 'enterprise') {
+        if (strtolower($this->productMetadata->getEdition()) == 'enterprise' ||
+            strtolower($this->productMetadata->getEdition()) == 'b2b') {
             return parent::render($element);
         }
         //$isConnected = $this->_scopeConfig->isSetFlag(Config::XML_PATH_QBONLINE_IS_CONNECTED);
