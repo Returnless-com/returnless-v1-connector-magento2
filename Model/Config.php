@@ -51,6 +51,11 @@ class Config
     const CONFIG_MARKETPLACE_SEARCH_VENDOR_ID = 'returnless_connector/marketplace_orders/integration_partner';
 
     /**
+     * const coupon or gift card account (for Magento Enterprise only)
+     */
+    const CONFIG_GENERATION_TYPE = 'returnless_connector/general/generation_type';
+
+    /**
      * Config constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
@@ -166,5 +171,20 @@ class Config
         );
 
         return $brandttributeCode;
+    }
+
+    /**
+     * @param $store
+     * @return string
+     */
+    public function getGenerationType($store = null)
+    {
+        $generationType = (string)$this->scopeConfig->getValue(
+            self::CONFIG_GENERATION_TYPE,
+            ScopeInterface::SCOPE_STORE,
+            $store
+        );
+
+        return $generationType;
     }
 }
