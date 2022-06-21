@@ -113,6 +113,13 @@ class OrderCreditMemo implements OrderCreditMemoInterface
 
         $order = $this->retHelper->searchOrder($requestParams['order_id']);
 
+        if (!$order->hasInvoices()) {
+            $response['code'] = 404;
+            $response['return_message'] = __("Order is not invoiced.");
+
+            return $response;
+        }
+
         $orderId = $order->getId();
         if (!$orderId) {
             $response['code'] = 404;
@@ -125,8 +132,25 @@ class OrderCreditMemo implements OrderCreditMemoInterface
         $itemToCredit = [];
 
         $creditMemoData['shipping_amount'] = 0;
+        if (isset($requestParams['shipping_amount'])
+            && !empty($requestParams['shipping_amount'])
+        ) {
+            $creditMemoData['shipping_amount'] = (float) $requestParams['shipping_amount'];
+        }
+
         $creditMemoData['adjustment_positive'] = 0;
+        if (isset($requestParams['adjustment_positive'])
+            && !empty($requestParams['adjustment_positive'])
+        ) {
+            $creditMemoData['adjustment_positive'] = (float) $requestParams['adjustment_positive'];
+        }
+
         $creditMemoData['adjustment_negative'] = 0;
+        if (isset($requestParams['adjustment_negative'])
+            && !empty($requestParams['adjustment_negative'])
+        ) {
+            $creditMemoData['adjustment_negative'] = (float) $requestParams['adjustment_negative'];
+        }
 
         $creditMemoData['do_offline'] = 0;
         if (isset($requestParams['payment_refund'])
@@ -152,10 +176,18 @@ class OrderCreditMemo implements OrderCreditMemoInterface
 
         foreach ($requestParams['items'] as $requestItem) {
             $item = $this->retHelper->getItemBySku($order, $requestItem['sku']);
+
+            if (!$item) {
+                $response['code'] = 404;
+                $response['return_message'] = __("Sku is not associated to Order.");
+
+                return $response;
+            }
+
             $orderItemId = $item->getId();
 
             $itemToCredit[$orderItemId] = [
-                'qty' => $requestItem['qty']
+                'qty' => (float) $requestItem['qty']
             ];
         }
         $creditMemoData['items'] = $itemToCredit;

@@ -182,6 +182,9 @@ class OrderInfo implements OrderInfoInterface
                 $orderInfo['customer']['phone'] = $shippingAddress->getTelephone();
             }
 
+            $orderInfo['di_shipping_costs']     = $order->getShippingAmount();
+            $orderInfo['di_shipping_costs_vat'] = $order->getShippingTaxAmount();
+
             $separateBundle = $this->config->getSeparateBundle();
             $orderItems = $separateBundle ? $order->getAllItems() : $order->getAllVisibleItems();
 
