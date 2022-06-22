@@ -6,6 +6,7 @@ use Magento\Sales\Model\OrderRepository;
 use Magento\Framework\Api\SearchCriteriaBuilder;;
 use Returnless\Connector\Model\Config;
 use Psr\Log\LoggerInterface as Logger;
+use Returnless\Connector\Helper\Data as RetHelper;
 
 /**
  * Class PartnersSourceAdapter
@@ -40,10 +41,16 @@ class PartnersSourceAdapter
     private $logger;
 
     /**
+     * @var RetHelper
+     */
+    protected $retHelper;
+
+    /**
      * PartnersSourceAdapter constructor.
      * @param OrderRepository $orderRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param \Returnless\Connector\Model\Config $config
+     * @param RetHelper $retHelper
      * @param array $partnersResource
      */
     public function __construct(
@@ -51,6 +58,7 @@ class PartnersSourceAdapter
         SearchCriteriaBuilder $searchCriteriaBuilder,
         Config $config,
         Logger $logger,
+        RetHelper $retHelper,
         $partnersResource = []
     ) {
         $this->config = $config;
@@ -58,6 +66,7 @@ class PartnersSourceAdapter
         $this->orderRepository = $orderRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->partnersResource = $partnersResource;
+        $this->retHelper = $retHelper;
     }
 
     /**
@@ -68,7 +77,7 @@ class PartnersSourceAdapter
      */
     public function getOrderById($orderId)
     {
-        $order = $this->getOrderByMagento($orderId);
+        $order = $this->retHelper->searchOrder($orderId);
         if (!$order->getId() && $this->config->getMarketplaceSearchEnabled()) {
             try {
                 $order = $this->getOrderByMarketplace($orderId);
@@ -94,27 +103,9 @@ class PartnersSourceAdapter
         )
             ->addFieldToSelect('order_id')
             ->getFirstItem();
-        $order =  $this->getOrderByMagento($partnerOrder->getOrderId(), 'increment_id');
+        $order = $this->retHelper->searchOrder($partnerOrder->getOrderId());
 
         return $order;
-    }
-
-    /**
-     * @param $incrementId
-     * @param string $searchKey
-     * @return \Magento\Framework\DataObject
-     */
-    private function getOrderByMagento($incrementId, $searchKey = 'increment_id')
-    {
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter(
-                $searchKey,
-                $incrementId,
-                'eq'
-            )
-            ->create();
-
-        return $this->orderRepository->getList($searchCriteria)->getFirstItem();
     }
 
     /**

@@ -13,6 +13,7 @@ use Returnless\Connector\Model\Config;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\App\ObjectManager;
 use Magento\Weee\Helper\Data;
+use Returnless\Connector\Helper\Data as RetHelper;
 
 /**
  * Interface OrderInfo
@@ -78,6 +79,11 @@ class OrderInfo implements OrderInfoInterface
     protected $weeeHelper;
 
     /**
+     * @var RetHelper
+     */
+    protected $retHelper;
+
+    /**
      * OrderInfo constructor.
      *
      * @param ProductRepository $productRepository
@@ -88,6 +94,7 @@ class OrderInfo implements OrderInfoInterface
      * @param OrderRepository $orderRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param Data $weeeHelper
+     * @param RetHelper $retHelper
      */
     public function __construct(
         ProductRepository $productRepository,
@@ -97,9 +104,9 @@ class OrderInfo implements OrderInfoInterface
         ResourceInterface $moduleResource,
         OrderRepository $orderRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        Data $weeeHelper
-    )
-    {
+        Data $weeeHelper,
+        RetHelper $retHelper
+    ){
         $this->productRepository = $productRepository;
         $this->logger = $logger;
         $this->image = $image;
@@ -108,6 +115,7 @@ class OrderInfo implements OrderInfoInterface
         $this->orderRepository = $orderRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->weeeHelper = $weeeHelper;
+        $this->retHelper = $retHelper;
     }
 
     /**
@@ -121,7 +129,7 @@ class OrderInfo implements OrderInfoInterface
         $this->logger->debug('[RET_ORDER_INFO] Increment Id', [$incrementId]);
 
         try {
-            $order = $this->getOrderByMagento($incrementId);
+            $order = $this->retHelper->searchOrder($incrementId);
             if (!$order->getId() && $this->config->getMarketplaceSearchEnabled()) {
                 /** @var \Returnless\Connector\Model\PartnersSourceAdapter $partnersSourceAdapter */
                 $partnersSourceAdapter = ObjectManager::getInstance()->get('Returnless\Connector\Model\PartnersSourceAdapter');
@@ -173,6 +181,9 @@ class OrderInfo implements OrderInfoInterface
                 $orderInfo['shipping_address']['addition'] = isset($street1[2]) ? $street1[2] : '';
                 $orderInfo['customer']['phone'] = $shippingAddress->getTelephone();
             }
+
+            $orderInfo['di_shipping_costs']     = $order->getShippingAmount();
+            $orderInfo['di_shipping_costs_vat'] = $order->getShippingTaxAmount();
 
             $separateBundle = $this->config->getSeparateBundle();
             $orderItems = $separateBundle ? $order->getAllItems() : $order->getAllVisibleItems();
@@ -276,24 +287,6 @@ class OrderInfo implements OrderInfoInterface
         }
 
         $this->returnResult($response);
-    }
-
-    /**
-     * @param $incrementId
-     * @param string $searchKey
-     * @return \Magento\Framework\DataObject
-     */
-    private function getOrderByMagento($incrementId, $searchKey = 'increment_id')
-    {
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter(
-                $searchKey,
-                $incrementId,
-                'eq'
-            )
-            ->create();
-
-        return $this->orderRepository->getList($searchCriteria)->getFirstItem();
     }
 
     /**
