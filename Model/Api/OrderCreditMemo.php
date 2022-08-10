@@ -152,11 +152,11 @@ class OrderCreditMemo implements OrderCreditMemoInterface
             $creditMemoData['adjustment_negative'] = (float) $requestParams['adjustment_negative'];
         }
 
-        $creditMemoData['do_offline'] = 0;
+        $creditMemoData['do_offline'] = 1;
         if (isset($requestParams['payment_refund'])
             && $requestParams['payment_refund'] == 'on'
         ) {
-            $creditMemoData['do_offline'] = 1;
+            $creditMemoData['do_offline'] = 0;
         }
 
         $creditMemoData['comment_text'] = '';
