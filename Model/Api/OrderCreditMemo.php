@@ -8,6 +8,7 @@ use Magento\Store\Model\ResourceModel\Website\CollectionFactory as WebsiteCollec
 use Returnless\Connector\Helper\Data as RetHelper;
 use Magento\Sales\Model\Order\CreditmemoFactory;
 use Magento\Sales\Model\Service\CreditmemoService;
+use Magento\Sales\Api\CreditmemoManagementInterface;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Email\Sender\CreditmemoSender;
 use Magento\Sales\Controller\Adminhtml\Order\CreditmemoLoader;
@@ -73,7 +74,7 @@ class OrderCreditMemo implements OrderCreditMemoInterface
      * @param CreditmemoSender $creditmemoSender
      * @param CreditmemoLoader $creditmemoLoader
      * @param CreditmemoFactory $creditMemoFactory
-     * @param CreditmemoService $creditMemoService
+     * @param CreditmemoManagementInterface $creditMemoService
      * @param Invoice $invoice
      * @param RetHelper $retHelper
      * @param WebsiteCollectionFactory $websiteCollection
@@ -84,7 +85,7 @@ class OrderCreditMemo implements OrderCreditMemoInterface
         CreditmemoSender $creditMemoSender,
         CreditmemoLoader $creditMemoLoader,
         CreditmemoFactory $creditMemoFactory,
-        CreditmemoService $creditMemoService,
+        CreditmemoManagementInterface $creditMemoService,
         Invoice $invoice,
         RetHelper $retHelper,
         WebsiteCollectionFactory $websiteCollection,
@@ -195,6 +196,18 @@ class OrderCreditMemo implements OrderCreditMemoInterface
         try {
             $this->creditMemoLoader->setOrderId($orderId); //pass order id
             $this->creditMemoLoader->setCreditmemo($creditMemoData);
+
+            $invoiceCollection = $order->getInvoiceCollection();
+            foreach ($invoiceCollection as $invoice) {
+                $state = $invoice->getState();
+
+                if ($state != 2) {
+                    continue;
+                }
+
+                $invoiceId = $invoice->getId();
+                $this->creditMemoLoader->setInvoiceId($invoiceId);
+            }
 
             $creditMemo = $this->creditMemoLoader->load();
             if ($creditMemo) {
