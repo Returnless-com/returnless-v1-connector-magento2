@@ -110,7 +110,10 @@ abstract class AbstractController extends Action
         $urlSignature = $this->getRequest()->getParam(self::HEADER_SIGNATURE);
         $returnlessSignature = $hashSignature ? $hashSignature : $urlSignature;
 
-        if (empty($returnlessSignature)) {
+        if (!$incrementId) {
+            $this->setResponse("Please enter first key for hash!", 401, true);
+            $isValid = false;
+        } elseif (empty($returnlessSignature)) {
             $this->setResponse("Can't find header: '" . self::HEADER_SIGNATURE . "'", 401, true);
             $isValid = false;
         } else {
