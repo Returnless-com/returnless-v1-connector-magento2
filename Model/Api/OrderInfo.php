@@ -355,7 +355,7 @@ class OrderInfo implements OrderInfoInterface
         $brandAttributeCode = !empty($brandAttributeCode) ? $brandAttributeCode : null;
 
         $uBrand = null;
-        if (!empty($brandAttributeCode)) {
+        if (!empty($brandAttributeCode) && $product->getResource()->getAttribute($brandAttributeCode)) {
             $uBrand = $product->getResource()->getAttribute($brandAttributeCode)->getFrontend()->getValue($product);
         }
 
