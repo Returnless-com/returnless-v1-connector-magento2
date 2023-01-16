@@ -157,6 +157,15 @@ class OrderCreditMemo implements OrderCreditMemoInterface
         if (isset($requestParams['payment_refund'])
             && $requestParams['payment_refund'] == 'on'
         ) {
+            $giftCards = json_decode($order->getGiftCards());
+            if (!empty($giftCards)) {
+                $response['code'] = 404;
+                $response['return_message'] = __("You can't create online refund.");
+
+                return $response;
+            }
+
+            // do online refund
             $creditMemoData['do_offline'] = 0;
         }
 
