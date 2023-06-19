@@ -61,18 +61,18 @@ class OrderCreditMemo implements OrderCreditMemoInterface
     /**
      * @var CreditmemoSender
      */
-    protected $creditmemoSender;
+    protected $creditMemoSender;
 
     /**
      * @var CreditmemoLoader
      */
-    protected $creditmemoLoader;
+    protected $creditMemoLoader;
 
     /**
      * OrderCoupon constructor.
      *
-     * @param CreditmemoSender $creditmemoSender
-     * @param CreditmemoLoader $creditmemoLoader
+     * @param CreditmemoSender $creditMemoSender
+     * @param CreditmemoLoader $creditMemoLoader
      * @param CreditmemoFactory $creditMemoFactory
      * @param CreditmemoManagementInterface $creditMemoService
      * @param Invoice $invoice
