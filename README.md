@@ -59,4 +59,4 @@ If you experience problems with the extension installation, setup or whenever yo
 
 ## License ##
 [BSD (Berkeley Software Distribution) License](http://www.opensource.org/licenses/bsd-license.php).
-Copyright (c) 2018-2020, Returnless
+Copyright (c) 2018-2023, Returnless
