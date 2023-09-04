@@ -129,19 +129,27 @@ class OrderInfo implements OrderInfoInterface
         $this->logger->debug('[RET_ORDER_INFO] Increment Id', [$incrementId]);
 
         try {
-            $order = $this->retHelper->searchOrder($incrementId);
-            if (!$order->getId() && $this->config->getMarketplaceSearchEnabled()) {
-                /** @var \Returnless\Connector\Model\PartnersSourceAdapter $partnersSourceAdapter */
+            if ($this->config->getMarketplaceSearchEnabled() && $this->config->getSearchPriority() === 'marketplace') {
                 $partnersSourceAdapter = ObjectManager::getInstance()->get('Returnless\Connector\Model\PartnersSourceAdapter');
                 $order = $partnersSourceAdapter->getOrderByMarketplace($incrementId);
+                if (!$order->getId()) {
+                    $order = $this->retHelper->searchOrder($incrementId);
+                }
+            } else {
+                $order = $this->retHelper->searchOrder($incrementId);
+                if (!$order->getId() && $this->config->getMarketplaceSearchEnabled()) {
+                    /** @var \Returnless\Connector\Model\PartnersSourceAdapter $partnersSourceAdapter */
+                    $partnersSourceAdapter = ObjectManager::getInstance()->get('Returnless\Connector\Model\PartnersSourceAdapter');
+                    $order = $partnersSourceAdapter->getOrderByMarketplace($incrementId);
+                }
             }
+
 
             $orderInfo['id'] = $order->getIncrementId();
             $orderInfo['order_id'] = $order->getEntityId();
             $orderInfo['create_at']['value'] = $order->getCreatedAt();
 
             $payment = $order->getPayment();
-            $methodTitle = '';
             if($payment) {
                 $method = $payment->getMethodInstance();
                 $methodTitle = $method->getTitle();

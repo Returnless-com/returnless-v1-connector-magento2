@@ -56,6 +56,11 @@ class Config
     const CONFIG_GENERATION_TYPE = 'returnless_connector/general/generation_type';
 
     /**
+     * const Order search priority
+     */
+    const CONFIG_MARKETPLACE_SEARCH_PRIORITY = 'returnless_connector/marketplace_orders/search_priority';
+
+    /**
      * Config constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
@@ -186,5 +191,18 @@ class Config
         );
 
         return $generationType;
+    }
+
+    /**
+     * @param $store
+     * @return string
+     */
+    public function getSearchPriority($store = null)
+    {
+        return (string) $this->scopeConfig->getValue(
+            self::CONFIG_MARKETPLACE_SEARCH_PRIORITY,
+            ScopeInterface::SCOPE_STORE,
+            $store
+        );
     }
 }
