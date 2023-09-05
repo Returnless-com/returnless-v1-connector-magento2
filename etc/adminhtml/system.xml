@@ -53,6 +53,10 @@
                     <label>Integration Partner</label>
                     <source_model>Returnless\Connector\Model\Config\Source\IntegrationPartner</source_model>
                 </field>
+                <field id="search_priority" translate="label" type="select" sortOrder="30" showInDefault="1" showInStore="1" showInWebsite="1">
+                    <label>Search priority</label>
+                    <source_model>Returnless\Connector\Model\Config\Source\SearchPriority</source_model>
+                </field>
             </group>
         </section>
     </system>
