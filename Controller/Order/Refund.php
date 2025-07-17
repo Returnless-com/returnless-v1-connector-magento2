@@ -36,7 +36,8 @@ class Refund extends AbstractController implements HttpPostActionInterface
         Context $context
     ) {
         $this->orderCreditMemo = $orderCreditMemo;
-        return parent::__construct(
+
+        parent::__construct(
             $config,
             $logger,
             $resultJsonFactory,

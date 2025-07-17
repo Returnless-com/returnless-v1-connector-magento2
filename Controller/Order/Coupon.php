@@ -43,7 +43,8 @@ class Coupon extends AbstractController implements HttpPostActionInterface
     ) {
         $this->orderCoupon = $orderCoupon;
         $this->giftCardAccount = $giftCardAccount;
-        return parent::__construct(
+
+        parent::__construct(
             $config,
             $logger,
             $resultJsonFactory,
