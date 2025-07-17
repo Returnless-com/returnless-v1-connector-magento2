@@ -45,11 +45,12 @@ class ModuleVersion extends Value
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
         ResourceInterface $moduleResource,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->moduleResource = $moduleResource;
+
         parent::__construct(
             $context,
             $registry,
