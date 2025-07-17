@@ -56,7 +56,7 @@ abstract class AbstractController extends Action
         $this->logger = $logger;
         $this->resultJsonFactory = $resultJsonFactory;
 
-        return parent::__construct($context);
+        parent::__construct($context);
     }
 
     /**

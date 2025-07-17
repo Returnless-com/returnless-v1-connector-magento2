@@ -58,7 +58,7 @@ class Info extends AbstractController
     ) {
         $this->orderInfo = $orderInfo;
 
-        return parent::__construct(
+        parent::__construct(
             $config,
             $logger,
             $resultJsonFactory,
