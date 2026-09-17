@@ -3,7 +3,7 @@
 >
 > This extension connects Magento 2 to **Returnless V1**, which has been superseded by Returnless V2. No further updates, bug fixes, security patches or support will be provided for this repository. Issues and pull requests will not be reviewed.
 >
-> **Migrating to Returnless V2?** The V2 Magento 2 extension lives at [Returnless-com/returnless-connector-magento2](https://github.com/Returnless-com/returnless-connector-magento2). Note that the V2 extension is optional and only needs to be installed when requested by Returnless. Contact [support@returnless.com](mailto:support@returnless.com) for migration questions.
+> **Connecting Returnless to Magento 2?** See the support article [Magento 2](https://support.returnless.com/article/1055-magento-2) for the current integration instructions, or contact [support@returnless.com](mailto:support@returnless.com).
 
 <p align="center">
   <img src="https://account.returnless.com/media/retour-integratie-magento-2.png" width="450"/>
