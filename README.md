@@ -1,10 +1,20 @@
+> [!WARNING]
+> **This project is abandoned and no longer maintained.**
+>
+> This extension connects Magento 2 to **Returnless V1**, which has been superseded by Returnless V2. No further updates, bug fixes, security patches or support will be provided for this repository. Issues and pull requests will not be reviewed.
+>
+> **Connecting Returnless to Magento 2?** See the support article [Magento 2](https://support.returnless.com/article/1055-magento-2) for the current integration instructions, or contact [support@returnless.com](mailto:support@returnless.com).
+
 <p align="center">
   <img src="https://account.returnless.com/media/retour-integratie-magento-2.png" width="450"/>
 </p>
-<h1 align="center">Returnless Connector for Magento 2.3.x and higher</h1>
+<h1 align="center">Returnless V1 Connector for Magento 2.3.x and higher (abandoned)</h1>
 
 
 <h2>Install using Composer</h2>
+
+> **Note:** The instructions below are kept for historical reference only. Do not install this extension for new integrations.
+
 Step-by-step to install the Returnless Connector for Magento® 2 by Composer:
 
 1. Open your SSH Console to connect to your Magento® 2 store. Once connected, locate the root of your Magento® 2 store.
@@ -59,4 +69,4 @@ If you experience problems with the extension installation, setup or whenever yo
 
 ## License ##
 [BSD (Berkeley Software Distribution) License](http://www.opensource.org/licenses/bsd-license.php).
-Copyright (c) 2018-2023, Returnless
+Copyright (c) 2018-2026, Returnless
