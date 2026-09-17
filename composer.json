@@ -18,5 +18,5 @@
         "AFL-3.0"
     ],
     "version": "1.4.1",
-    "abandoned": "returnless-com/magento2_v2"
+    "abandoned": true
 }
